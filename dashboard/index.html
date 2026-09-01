@@ -101,6 +101,7 @@
         .header-logo img { width: 100%; height: 100%; object-fit: cover; }
         .header-title { font-size: 18px; font-weight: 800; color: var(--dark); }
         .header-title .t-accent { color: var(--primary); }
+        .header-subtitle { font-size: 8px; color: var(--text-light); }
         .header-currency { display: flex; align-items: center; gap: 6px; }
         .currency-badge {
             display: flex; align-items: center; gap: 4px;
@@ -133,14 +134,24 @@
             border-bottom: 1px dashed var(--text-light); padding-bottom: 8px;
         }
         .game-modes-header i { color: var(--primary); }
-        .game-modes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .game-modes-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 8px; 
+            grid-auto-flow: dense;
+        }
         .game-mode-card {
             background: var(--bg2); border: var(--border); border-radius: var(--radius);
             overflow: hidden; cursor: pointer; box-shadow: 2px 2px 0 #000;
             position: relative; transition: all 0.2s ease;
+            grid-column: span 1;
+        }
+        .game-mode-card.featured {
+            grid-column: span 2;
         }
         .game-mode-card:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 #000; }
-        .game-mode-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+        .game-mode-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
+        .game-mode-card.featured img { aspect-ratio: 2/1; }
         .game-mode-card .game-mode-label {
             position: absolute; bottom: 0; right: 0; left: 0;
             background: rgba(0,0,0,.6); color: #fff;
@@ -258,7 +269,11 @@
         .nav-item span { font-size: 7px; font-weight: 600; }
         .nav-item.active { color: var(--primary); }
 
-        @media(max-width: 480px) { .game-modes-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media(max-width: 480px) {
+            .game-modes-grid { grid-template-columns: repeat(2, 1fr); }
+            .game-mode-card.featured { grid-column: span 2; }
+            .game-mode-card.featured img { aspect-ratio: 2/1; }
+        }
     </style>
 </head>
 <body>
@@ -270,6 +285,7 @@
                 <div class="header-logo"><img src="https://cdn.imgurl.ir/uploads/i675155_InShot_20260901_173249929.png" alt="دوزیکو" draggable="false" oncontextmenu="return false;" ondragstart="return false;"></div>
                 <div>
                     <div class="header-title" id="headerTitle">دوزی<span class="t-accent">کو</span></div>
+                    <div class="header-subtitle">دنیایی از دوز های عجیب و غریب</div>
                 </div>
             </div>
             <div class="header-currency">
@@ -293,7 +309,7 @@
 
             <div class="games-section">
                 <div class="games-section-header">
-                    <span class="games-section-title"><i class="bi bi-globe"></i> بازی‌های در جریان</span>
+                    <span class="games-section-title"><i class="bi bi-globe"></i> بازی های آنلاین در جریان</span>
                     <span class="games-section-badge" id="activeCount">0</span>
                 </div>
                 <div class="games-list" id="activeList"></div>
@@ -301,23 +317,15 @@
 
             <div class="games-section">
                 <div class="games-section-header">
-                    <span class="games-section-title"><i class="bi bi-trophy"></i> لیگ در جریان</span>
-                    <span class="games-section-badge" id="leagueCount">0</span>
+                    <span class="games-section-title"><i class="bi bi-trophy"></i> لیگ و حذفی در جریان</span>
+                    <span class="games-section-badge" id="tournamentCount">0</span>
                 </div>
-                <div class="games-list" id="leagueList"></div>
+                <div class="games-list" id="tournamentList"></div>
             </div>
 
             <div class="games-section">
                 <div class="games-section-header">
-                    <span class="games-section-title"><i class="bi bi-x-circle"></i> حذفی در جریان</span>
-                    <span class="games-section-badge" id="eliminationCount">0</span>
-                </div>
-                <div class="games-list" id="eliminationList"></div>
-            </div>
-
-            <div class="games-section">
-                <div class="games-section-header">
-                    <span class="games-section-title"><i class="bi bi-clock-history"></i> بازی‌های گذشته</span>
+                    <span class="games-section-title"><i class="bi bi-clock-history"></i> ۵ بازی گذشته</span>
                     <span class="games-section-badge" id="pastCount">0</span>
                 </div>
                 <div class="games-list" id="pastList"></div>
@@ -364,15 +372,15 @@
             document.addEventListener('cut', function(e) { e.preventDefault(); });
 
             var gameModes = [
-                { id: 'classic', name: 'کلاسیک دوز', image: 'https://cdn.imgurl.ir/uploads/k12605_InShot_20260319_223942776.png' },
-                { id: 'large', name: 'لارج دوز', image: 'https://cdn.imgurl.ir/uploads/o905677_InShot_20260319_224350013.png' },
+                { id: 'classic', name: 'کلاسیک دوز', image: 'https://cdn.imgurl.ir/uploads/k12605_InShot_20260319_223942776.png', featured: true },
+                { id: 'large', name: 'لارج دوز', image: 'https://cdn.imgurl.ir/uploads/o905677_InShot_20260319_224350013.png', featured: true },
                 { id: 'special', name: 'دوز ویژه', image: 'https://cdn.imgurl.ir/uploads/n79293_InShot_20260319_223528294.png' },
-                { id: 'scenario', name: 'سناریو', image: 'https://cdn.imgurl.ir/uploads/b7677_InShot_20260319_223318743.png' },
-                { id: 'bomb', name: 'بمب مود', image: 'https://cdn.imgurl.ir/uploads/a281336_InShot_20260319_224811542.png' },
+                { id: 'scenario', name: 'سناریو', image: 'https://cdn.imgurl.ir/uploads/b7677_InShot_20260319_223318743.png', featured: true },
+                { id: 'bomb', name: 'بمب مود', image: 'https://cdn.imgurl.ir/uploads/a281336_InShot_20260319_224811542.png', featured: true },
                 { id: 'mirror', name: 'آینه مود', image: 'https://cdn.imgurl.ir/uploads/x590062_InShot_20260319_225320798.png' },
-                { id: 'virus', name: 'ویروس مود', image: 'https://cdn.imgurl.ir/uploads/b62445_InShot_20260319_225046847.png' },
+                { id: 'virus', name: 'ویروس مود', image: 'https://cdn.imgurl.ir/uploads/b62445_InShot_20260319_225046847.png', featured: true },
                 { id: 'shadow', name: 'سایه مود', image: 'https://cdn.imgurl.ir/uploads/e061798_InShot_20260319_231847488.png' },
-                { id: 'double', name: 'دبل دوز', image: 'https://cdn.imgurl.ir/uploads/c466102_InShot_20260319_230242848.png' },
+                { id: 'double', name: 'دبل دوز', image: 'https://cdn.imgurl.ir/uploads/c466102_InShot_20260319_230242848.png', featured: true },
                 { id: 'dooz_in_dooz', name: 'دوز تو دوز', image: 'https://cdn.imgurl.ir/uploads/z900223_InShot_20260319_230526991.png' },
                 { id: 'league', name: 'لیگ دوز', image: 'https://cdn.imgurl.ir/uploads/g58403_InShot_20260319_232214015.png' },
                 { id: 'elimination', name: 'حذفی دوز', image: 'https://cdn.imgurl.ir/uploads/u256787_InShot_20260319_233031459.png' }
@@ -455,7 +463,8 @@
             function renderGameModes() {
                 var grid = document.getElementById('gameModesGrid');
                 grid.innerHTML = gameModes.map(function(mode) {
-                    return '<div class="game-mode-card" onclick="startGame(\'' + mode.id + '\')">' +
+                    var featuredClass = mode.featured ? ' featured' : '';
+                    return '<div class="game-mode-card' + featuredClass + '" onclick="startGame(\'' + mode.id + '\')">' +
                         '<img src="' + mode.image + '" alt="' + mode.name + '" draggable="false" oncontextmenu="return false;" ondragstart="return false;">' +
                         '<div class="game-mode-label">' + mode.name + '</div></div>';
                 }).join('');
@@ -490,13 +499,11 @@
                     }
 
                     document.getElementById('activeCount').textContent = '0';
-                    document.getElementById('leagueCount').textContent = '0';
-                    document.getElementById('eliminationCount').textContent = '0';
+                    document.getElementById('tournamentCount').textContent = '0';
                     document.getElementById('pastCount').textContent = '0';
                     
-                    document.getElementById('activeList').innerHTML = renderEmpty('بازی در جریانی نیست');
-                    document.getElementById('leagueList').innerHTML = renderEmpty('لیگی در جریان نیست');
-                    document.getElementById('eliminationList').innerHTML = renderEmpty('حذفی در جریان نیست');
+                    document.getElementById('activeList').innerHTML = renderEmpty('بازی آنلاینی در جریان نیست');
+                    document.getElementById('tournamentList').innerHTML = renderEmpty('لیگ یا حذفی در جریان نیست');
                     document.getElementById('pastList').innerHTML = renderEmpty('بازی گذشته‌ای نیست');
 
                 } catch(e) {
