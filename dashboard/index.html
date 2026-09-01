@@ -138,24 +138,20 @@
             display: grid; 
             grid-template-columns: repeat(3, 1fr); 
             gap: 8px; 
-            grid-auto-flow: dense;
         }
         .game-mode-card {
             background: var(--bg2); border: var(--border); border-radius: var(--radius);
             overflow: hidden; cursor: pointer; box-shadow: 2px 2px 0 #000;
             position: relative; transition: all 0.2s ease;
-            grid-column: span 1;
-        }
-        .game-mode-card.featured {
-            grid-column: span 2;
         }
         .game-mode-card:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 #000; }
-        .game-mode-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
-        .game-mode-card.featured img { aspect-ratio: 2/1; }
+        .game-mode-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; transition: transform 0.2s ease; }
+        .game-mode-card.big-img img { transform: scale(1.1); }
         .game-mode-card .game-mode-label {
             position: absolute; bottom: 0; right: 0; left: 0;
             background: rgba(0,0,0,.6); color: #fff;
             font-size: 8px; font-weight: 700; padding: 4px; text-align: center;
+            z-index: 2;
         }
 
         .games-section { background: var(--card-bg); border: var(--border); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); }
@@ -270,9 +266,7 @@
         .nav-item.active { color: var(--primary); }
 
         @media(max-width: 480px) {
-            .game-modes-grid { grid-template-columns: repeat(2, 1fr); }
-            .game-mode-card.featured { grid-column: span 2; }
-            .game-mode-card.featured img { aspect-ratio: 2/1; }
+            .game-modes-grid { grid-template-columns: repeat(3, 1fr); }
         }
     </style>
 </head>
@@ -372,15 +366,15 @@
             document.addEventListener('cut', function(e) { e.preventDefault(); });
 
             var gameModes = [
-                { id: 'classic', name: 'کلاسیک دوز', image: 'https://cdn.imgurl.ir/uploads/k12605_InShot_20260319_223942776.png', featured: true },
-                { id: 'large', name: 'لارج دوز', image: 'https://cdn.imgurl.ir/uploads/o905677_InShot_20260319_224350013.png', featured: true },
+                { id: 'classic', name: 'کلاسیک دوز', image: 'https://cdn.imgurl.ir/uploads/k12605_InShot_20260319_223942776.png', bigImg: true },
+                { id: 'large', name: 'لارج دوز', image: 'https://cdn.imgurl.ir/uploads/o905677_InShot_20260319_224350013.png', bigImg: true },
                 { id: 'special', name: 'دوز ویژه', image: 'https://cdn.imgurl.ir/uploads/n79293_InShot_20260319_223528294.png' },
-                { id: 'scenario', name: 'سناریو', image: 'https://cdn.imgurl.ir/uploads/b7677_InShot_20260319_223318743.png', featured: true },
-                { id: 'bomb', name: 'بمب مود', image: 'https://cdn.imgurl.ir/uploads/a281336_InShot_20260319_224811542.png', featured: true },
+                { id: 'scenario', name: 'سناریو', image: 'https://cdn.imgurl.ir/uploads/b7677_InShot_20260319_223318743.png', bigImg: true },
+                { id: 'bomb', name: 'بمب مود', image: 'https://cdn.imgurl.ir/uploads/a281336_InShot_20260319_224811542.png', bigImg: true },
                 { id: 'mirror', name: 'آینه مود', image: 'https://cdn.imgurl.ir/uploads/x590062_InShot_20260319_225320798.png' },
-                { id: 'virus', name: 'ویروس مود', image: 'https://cdn.imgurl.ir/uploads/b62445_InShot_20260319_225046847.png', featured: true },
+                { id: 'virus', name: 'ویروس مود', image: 'https://cdn.imgurl.ir/uploads/b62445_InShot_20260319_225046847.png', bigImg: true },
                 { id: 'shadow', name: 'سایه مود', image: 'https://cdn.imgurl.ir/uploads/e061798_InShot_20260319_231847488.png' },
-                { id: 'double', name: 'دبل دوز', image: 'https://cdn.imgurl.ir/uploads/c466102_InShot_20260319_230242848.png', featured: true },
+                { id: 'double', name: 'دبل دوز', image: 'https://cdn.imgurl.ir/uploads/c466102_InShot_20260319_230242848.png', bigImg: true },
                 { id: 'dooz_in_dooz', name: 'دوز تو دوز', image: 'https://cdn.imgurl.ir/uploads/z900223_InShot_20260319_230526991.png' },
                 { id: 'league', name: 'لیگ دوز', image: 'https://cdn.imgurl.ir/uploads/g58403_InShot_20260319_232214015.png' },
                 { id: 'elimination', name: 'حذفی دوز', image: 'https://cdn.imgurl.ir/uploads/u256787_InShot_20260319_233031459.png' }
@@ -463,8 +457,8 @@
             function renderGameModes() {
                 var grid = document.getElementById('gameModesGrid');
                 grid.innerHTML = gameModes.map(function(mode) {
-                    var featuredClass = mode.featured ? ' featured' : '';
-                    return '<div class="game-mode-card' + featuredClass + '" onclick="startGame(\'' + mode.id + '\')">' +
+                    var bigImgClass = mode.bigImg ? ' big-img' : '';
+                    return '<div class="game-mode-card' + bigImgClass + '" onclick="startGame(\'' + mode.id + '\')">' +
                         '<img src="' + mode.image + '" alt="' + mode.name + '" draggable="false" oncontextmenu="return false;" ondragstart="return false;">' +
                         '<div class="game-mode-label">' + mode.name + '</div></div>';
                 }).join('');
